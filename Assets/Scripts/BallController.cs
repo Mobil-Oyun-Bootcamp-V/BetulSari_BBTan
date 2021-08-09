@@ -4,40 +4,64 @@ using UnityEngine;
 
 public class BallController : MonoBehaviour
 {
+    public enum ballState
+    {
+        aim,
+        fire,
+        wait,
+        endShot
+    }
+
+    public ballState currentBallState;
+    
     public Rigidbody2D ball;
     private Vector2 mouseStartPosition;
     private Vector2 mouseEndPosition;
-    public bool didClick;
-    public bool didDrag;
-    public bool canInteract;
     private float ballVelocityX;
     private float ballVelocityY;
     public float constantSpeed;
     public GameObject arrow;
     
-    // Start is called before the first frame update
+    
     void Start()
     {
-        
+        currentBallState = ballState.aim;
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && canInteract)
+        switch (currentBallState)
         {
-            MouseClicked();
-        }
+            case ballState.aim:
+                if (Input.GetMouseButtonDown(0))
+                {
+                    MouseClicked();
+                }
 
-        if (Input.GetMouseButton(0) && canInteract)
-        {
-            MouseDragged();
-        }
+                if (Input.GetMouseButton(0))
+                {
+                    MouseDragged();
+                }
 
-        if (Input.GetMouseButtonUp(0) && canInteract)
-        {
-            ReleaseMouse();
+                if (Input.GetMouseButtonUp(0))
+                {
+                    ReleaseMouse();
+                }
+                break;
+            case ballState.fire:
+                
+                break;
+            case ballState.wait:
+                
+                break;
+            case ballState.endShot:
+                
+                break;
+            default:
+                break;
         }
+        
             
     }
 
@@ -45,12 +69,10 @@ public class BallController : MonoBehaviour
     {
         mouseStartPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Debug.Log(mouseStartPosition);
-        didClick = true;
     }
 
     public void MouseDragged()
     {
-        didDrag = true;
         //Move the Arrow
         arrow.SetActive(true);
         Vector2 tempMousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -77,9 +99,8 @@ public class BallController : MonoBehaviour
         {
             return; // if we just click on the screen, Ball doesnt move.
         }
-        didClick = false;
-        didDrag = false;
-        canInteract = false;
-        
+
+        currentBallState = ballState.fire;
+
     }
 }
