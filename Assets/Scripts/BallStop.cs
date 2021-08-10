@@ -7,11 +7,12 @@ public class BallStop : MonoBehaviour
 {
     public Rigidbody2D ball;
     public BallController ballControl;
+    private GameManager _gameManager;
     
     
     void Start()
     {
-        
+        _gameManager = FindObjectOfType<GameManager>();
     }
     
     
@@ -28,7 +29,13 @@ public class BallStop : MonoBehaviour
             ball.velocity = Vector2.zero;
             //reset the level
             //set the ball as active
-            ballControl.currentBallState = BallController.ballState.aim;
+            ballControl.currentBallState = BallController.ballState.wait;
+        }
+
+        if (other.gameObject.tag == "Extra Ball")
+        {
+            _gameManager.ballsInScene.Remove(other.gameObject);
+            other.gameObject.SetActive(false);
         }
     }
 }

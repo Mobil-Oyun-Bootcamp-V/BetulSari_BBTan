@@ -17,15 +17,21 @@ public class BallController : MonoBehaviour
     public Rigidbody2D ball;
     private Vector2 mouseStartPosition;
     private Vector2 mouseEndPosition;
+    public Vector2 tempVelocity;
+    public Vector3 ballLaunchPosition;
     private float ballVelocityX;
     private float ballVelocityY;
     public float constantSpeed;
     public GameObject arrow;
+    private GameManager _gameManager;
     
     
     void Start()
     {
+        arrow.SetActive(false);
+        _gameManager = FindObjectOfType<GameManager>();
         currentBallState = ballState.aim;
+        _gameManager.ballsInScene.Add(this.gameObject);
     }
 
     
@@ -53,10 +59,18 @@ public class BallController : MonoBehaviour
                 
                 break;
             case ballState.wait:
-                
+                if (_gameManager.ballsInScene.Count == 1)
+                {
+                    currentBallState = ballState.endShot;
+                }
                 break;
             case ballState.endShot:
-                
+                for (int i = 0; i < _gameManager.bricksInScene.Count; i++)
+                {
+                    _gameManager.bricksInScene[i].GetComponent<BrickMovementController>().currentState = BrickMovementController.brickState.move;
+                }
+                _gameManager.PlaceBricks();
+                currentBallState = ballState.aim;
                 break;
             default:
                 break;
@@ -93,13 +107,14 @@ public class BallController : MonoBehaviour
         mouseEndPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         ballVelocityX = (mouseStartPosition.x - mouseEndPosition.x);
         ballVelocityY = (mouseStartPosition.y - mouseEndPosition.y);
-        Vector2 tempVelocity = new Vector2(ballVelocityX, ballVelocityY).normalized;
+        tempVelocity = new Vector2(ballVelocityX, ballVelocityY).normalized;
         ball.velocity = constantSpeed * tempVelocity;
         if (ball.velocity == Vector2.zero)
         {
             return; // if we just click on the screen, Ball doesnt move.
         }
 
+        ballLaunchPosition = transform.position;
         currentBallState = ballState.fire;
 
     }
